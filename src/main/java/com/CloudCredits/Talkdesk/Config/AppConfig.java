@@ -50,7 +50,7 @@ public class AppConfig {
             )
 
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/app/**").authenticated()
                 .anyRequest().permitAll()
             )
             
