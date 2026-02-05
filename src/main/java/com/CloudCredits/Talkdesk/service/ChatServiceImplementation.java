@@ -49,7 +49,7 @@ public class ChatServiceImplementation implements ChatService{
 		if(chat.isPresent()) {
 			return chat.get();	
 		}
-		throw new ChatException("Chat not found with id"+ChatId);
+		throw new  ChatException("Chat not found with id"+ChatId);
 		
 	}
 
@@ -74,8 +74,7 @@ public class ChatServiceImplementation implements ChatService{
 		
 		for(Integer userId:req.getUserIds()) {
 			User user=userservice.findUserById(userId);
-			group.getUsers().add(user);
-			
+			group.getUsers().add(user);	
 		}
 		return group;
 	}
@@ -86,38 +85,64 @@ public class ChatServiceImplementation implements ChatService{
 		User user=userservice.findUserById(userId);
 		
 		if(opt.isPresent()) {
-			Chat chat=opt.get();
-			
+			Chat chat=opt.get();	
 			if(chat.getAdmins().contains(reqUser)) {
 				chat.getUsers().add(user);
-				return chat;
+				return chatRepository.save(chat);
 			}
 			else {
 				throw new UserException("you are not admin");
-			}
+			}		
+		}
 			
+		throw new ChatException("chat not found with id"+chatId);	
+	}
+
+	@Override
+	public Chat renameGroup(Integer chatId, String groupName, User reqUser) throws ChatException, UserException {
+		Optional<Chat> opt=chatRepository.findById(chatId);
+		if(opt.isPresent()){
+			Chat chat=opt.get();
+			if(chat.getUsers().contains(reqUser)) {
+				chat.setChat_name(groupName);
+				return chatRepository.save(chat);		
+			}
+			throw new UserException("you are not member of this group");		
+		}
+	
+		throw new ChatException("chat not found with id"+chatId);	
+	}
+
+	@Override
+	public Chat removeFromGroup(Integer chatId, Integer userId, User reqUser) throws UserException, ChatException {
+		Optional<Chat> opt=chatRepository.findById(chatId);
+		User user=userservice.findUserById(userId);
+		
+		if(opt.isPresent()) {
+			Chat chat=opt.get();	
+			if(chat.getAdmins().contains(reqUser)) {
+				chat.getUsers().remove(user);
+				return chatRepository.save(chat);
+			}
+			else if(chat.getUsers().contains(reqUser)) {
+				if(user.getId().equals(reqUser.getId())) {
+					chat.getUsers().remove(user);
+					return chatRepository.save(chat);	
+				}		
+			}
+				throw new UserException("you can't remove another user");				
 		}
 			
 		throw new ChatException("chat not found with id"+chatId);
+	}
+
+	@Override
+	public void deleteChat(Integer chatId, Integer userId) throws ChatException, UserException {
 		
+		Optional<Chat> opt=chatRepository.findById(chatId);
+		if(opt.isPresent()) {
+			Chat chat=opt.get();
+			chatRepository.deleteById(chat.getId());
+		}	
 	}
-
-	@Override
-	public Chat renameGroup(Integer chatId, String groupName, Integer reqUserId) throws ChatException, UserException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Chat removeFromGroup(Integer chatId, Integer userId, Integer reqUser) throws UserException, ChatException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Chat deleteChat(Integer chatId, Integer userId) throws ChatException, UserException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

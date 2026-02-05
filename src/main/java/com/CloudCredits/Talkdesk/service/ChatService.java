@@ -19,9 +19,9 @@ public interface ChatService {
 	
 	public Chat addUserToGroup(Integer userId, Integer chatId,User reqUser) throws UserException, ChatException;
 	
-	public Chat renameGroup(Integer chatId, String groupName, Integer reqUserId) throws ChatException,UserException;
+	public Chat renameGroup(Integer chatId, String groupName, User reqUserId) throws ChatException,UserException;
 	
-	public Chat removeFromGroup(Integer chatId, Integer userId,Integer reqUser) throws UserException, ChatException;
+	public Chat removeFromGroup(Integer chatId, Integer userId,User reqUser) throws UserException, ChatException;
 	
-	public Chat deleteChat(Integer chatId, Integer userId) throws ChatException, UserException;
+	public void deleteChat(Integer chatId, Integer userId) throws ChatException, UserException;
 }
